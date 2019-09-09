@@ -1,0 +1,40 @@
+dbBatch:
+  - id: "user-delete"
+    name: "ユーザー論理削除"
+    sql: |
+      UPDATE user SET deleted_at = now() WHERE user_id = :user_id
+    params:
+      - "user_id"
+  - id: "user-delete-revert"
+    name: "ユーザー論理削除から復活"
+    sql: |
+      UPDATE user SET deleted_at = NULL WHERE user_id = :user_id
+    params:
+      - "user_id"
+dbCsv:
+  - id: "user-all"
+    name: "全ユーザーデータ"
+    description: |
+      全ユーザーデータ
+    sql: |
+      SELECT * FROM user;
+  - id: "user-lastday"
+    name: "24時間ユーザーデータ"
+    description: |
+      全ユーザーデータ
+    sql: |
+      SELECT * FROM user WHERE DATE_SUB(now(),INTERVAL 1 DAY);
+s3Upload:
+  bucket: "bucket-name"
+  url: "https://cdn.repy.info/"
+dynamoUpload:
+  - id: "prod"
+    name: "リダイレクト 本番"
+    table: "redirect"
+    keyName: "id"
+    keyValue: "Production"
+  - id: "stage"
+    name: "ステージ"
+    table: "redirect"
+    keyName: "id"
+    keyValue: "Stage"

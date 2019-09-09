@@ -1,0 +1,28 @@
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>ファイルアップロード</title>
+</head>
+<body>
+<div>
+    <div>
+        <a href="/">ツールトップ</a> → ファイルアップロード
+    </div>
+
+    <form method="{{form.method}}" enctype="{{form.enctype}}" action="{{form.action}}">
+        {{#form.hiddenInput}}
+        <input type="hidden" name="{{key}}" value="{{value}}">
+        {{/form.hiddenInput}}
+        <select name="content-type">
+            <option value="image/png">PNG</option>
+            <option value="image/jpeg">JPEG</option>
+            <option value="image/gif">GIF</option>
+            <option value="image/svg+xml">SVG</option>
+            <option value="video/mp4">MP4</option>
+        </select><br>
+        <input type="file" name="file"><br>
+        <button type="submit">アップロード</button>
+    </form>
+</div>
+</body>
+</html>

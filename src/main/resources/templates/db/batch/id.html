@@ -1,0 +1,21 @@
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>{{sql.name}}</title>
+</head>
+<body>
+<div>
+    <div>
+        <a href="/">ツールトップ</a> → <a href="/db/batch">データベース一括処理</a> → {{sql.name}}
+    </div>
+    <div>
+        <a download="{{sql.id}}.csv" href="/db/batch/{{sql.id}}/download">CSVダウンロード</a><br>
+    </div>
+    <form method="post" enctype="multipart/form-data" action="/db/batch/{{sql.id}}">
+        CSV:<input type="file" name="file"><br>
+        <button type="submit">実行</button>
+        <br>
+    </form>
+</div>
+</body>
+</html>
