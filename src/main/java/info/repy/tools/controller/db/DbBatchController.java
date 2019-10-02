@@ -37,7 +37,7 @@ public class DbBatchController {
     public ModelAndView id(@PathVariable("id") String id) {
         List<DbBatchConfig> conf = config.read().getDbBatch();
         Optional<DbBatchConfig> sqlOpt = conf.stream().filter((data) -> {
-            return Objects.equals(data, id);
+            return Objects.equals(data.getId(), id);
         }).findFirst();
         return new ModelAndView("db/batch/id").addObject("sql", sqlOpt.get());
     }
