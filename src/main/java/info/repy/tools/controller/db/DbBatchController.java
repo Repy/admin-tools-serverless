@@ -56,6 +56,9 @@ public class DbBatchController {
         ArrayList<Map<String, String>> list = new ArrayList<>();
         Map<String, String> data;
         while ((data = reader.readMap()) != null) list.add(data);
+        if (sql.getInitSql() != null) {
+            this.jdbc.update(sql.getInitSql(), new HashMap<>());
+        }
         this.jdbc.batchUpdate(sql.getSql(), list.toArray(new Map[]{}));
         return new ModelAndView("db/batch/id").addObject("sql", sql);
     }
