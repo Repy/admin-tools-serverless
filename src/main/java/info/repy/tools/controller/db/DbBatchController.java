@@ -37,7 +37,7 @@ public class DbBatchController {
     public ModelAndView id(@PathVariable("id") String id) {
         List<DbBatchConfig> conf = config.read().getDbBatch();
         Optional<DbBatchConfig> sqlOpt = conf.stream().filter((data) -> {
-            return Objects.equals(data, id);
+            return Objects.equals(data.getId(), id);
         }).findFirst();
         return new ModelAndView("db/batch/id").addObject("sql", sqlOpt.get());
     }
@@ -56,6 +56,9 @@ public class DbBatchController {
         ArrayList<Map<String, String>> list = new ArrayList<>();
         Map<String, String> data;
         while ((data = reader.readMap()) != null) list.add(data);
+        if (sql.getInitSql() != null) {
+            this.jdbc.update(sql.getInitSql(), new HashMap<>());
+        }
         this.jdbc.batchUpdate(sql.getSql(), list.toArray(new Map[]{}));
         return new ModelAndView("db/batch/id").addObject("sql", sql);
     }

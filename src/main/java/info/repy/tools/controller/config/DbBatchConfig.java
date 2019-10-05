@@ -9,5 +9,6 @@ public class DbBatchConfig {
     private String id;
     private String name;
     private String sql;
+    private String initSql;
     private String[] params;
 }
