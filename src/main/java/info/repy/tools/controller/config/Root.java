@@ -10,4 +10,5 @@ public class Root {
     private List<DbCsvConfig> dbCsv;
     private S3UploadConfig s3Upload;
     private List<DynamoUploadConfig> dynamoUpload;
+    private List<S3UpdateConfig> s3Update;
 }

@@ -3,7 +3,6 @@ package info.repy.tools.controller.s3;
 import info.repy.tools.controller.Config;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.servlet.ModelAndView;
@@ -18,9 +17,6 @@ import java.util.UUID;
 public class S3UploadController {
     @Autowired
     private Config config;
-
-    @Autowired
-    private NamedParameterJdbcTemplate jdbc;
 
     @GetMapping(path = "/s3/upload")
     public ModelAndView get() {

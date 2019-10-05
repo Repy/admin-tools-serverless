@@ -27,6 +27,14 @@ dbCsv:
 s3Upload:
   bucket: "bucket-name"
   url: "https://cdn.repy.info/"
+s3Update:
+  - id: "json-file"
+    name: "JSONファイル"
+    bucket: "bucket-name"
+    contentType: "application/json; charset=utf-8"
+    language: "json"
+    cacheControl: "max-age=3600"
+    key: "path/file.json"
 dynamoUpload:
   - id: "prod"
     name: "リダイレクト 本番"

@@ -3,6 +3,7 @@ package info.repy.tools.controller.dynamodb;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import info.repy.dynamodb.DynamoDBJsonConvert;
 import info.repy.tools.controller.Config;
 import info.repy.tools.controller.config.DynamoUploadConfig;
 import org.springframework.beans.factory.annotation.Autowired;

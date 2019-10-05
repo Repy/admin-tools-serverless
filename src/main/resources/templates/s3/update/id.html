@@ -1,0 +1,53 @@
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>{{idConf.name}}</title>
+</head>
+<body>
+<div>
+    <div>
+        <a href="/">ツールトップ</a> → <a href="/s3/update">S3編集</a> → {{idConf.name}}
+    </div>
+    <div>
+        <form method="post" action="/s3/update/{{idConf.id}}" enctype="application/x-www-form-urlencoded">
+            <div id="container" style="height:500px;border:1px solid black;"></div>
+            <textarea style="display:none;" id="input" name="data">{{data}}</textarea>
+            <button type="submit">保存</button>
+        </form>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.18.0/min/vs/loader.js"></script>
+    <script>
+require.config({ paths: { 'vs': 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.18.0/min/vs' } });
+window.MonacoEnvironment = {
+    getWorkerUrl: function (workerId, label) {
+        return 'data:text/javascript;charset=utf-8,'+encodeURIComponent("self.MonacoEnvironment={baseUrl:'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.18.0/min/'};importScripts('https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.18.0/min/vs/base/worker/workerMain.js');");
+    }
+};
+require(["vs/editor/editor.main"], function () {
+    var input = document.getElementById("input");
+    var editer = monaco.editor.create(document.getElementById('container'), {
+        value: input.value,
+        language: '{{idConf.language}}',
+        formatOnType: true,
+        formatOnPaste: true,
+        autoIndent: true,
+        automaticLayout: true
+    });
+    var model = editer.getModel();
+    model.onDidChangeContent(function () {
+        input.value = model.getValue();
+    });
+    function retry() {
+        var now = model.getValue();
+        editer.getAction('editor.action.formatDocument').run().then(function(){
+            if(now !== model.getValue()) return;
+            setTimeout(retry, 100);
+        });
+    }
+    retry();
+});
+    </script>
+</div>
+</body>
+</html>
