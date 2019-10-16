@@ -64,6 +64,8 @@ dependencies {
 
     // other
     implementation 'com.opencsv:opencsv:4.6'
+    implementation 'com.ibm.icu:icu4j:65.1'
+    implementation 'commons-io:commons-io:2.6'
     runtimeOnly 'mysql:mysql-connector-java:8.0.17'
 
 }
