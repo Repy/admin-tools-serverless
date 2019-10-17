@@ -1,0 +1,31 @@
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>{{sql.name}}</title>
+</head>
+<body>
+<div>
+    <div>
+        <a href="/">ツールトップ</a> → <a href="/db/csv">CSV出し</a> → <a href="/db/csv/{{sql.id}}">{{sql.name}}</a> → 表示
+    </div>
+    <pre>{{sql.description}}</pre>
+    <div>
+        <a download="{{sql.id}}.csv" href="/db/csv/{{sql.id}}/download">CSVダウンロード</a><br>
+    </div>
+    <div>
+        <table border="1">
+            <tr>
+                {{#data.headers}}
+                <th>{{.}}</th>
+                {{/data.headers}}
+            </tr>
+            <tr>
+                {{#data.rows}}
+                <th>{{.}}</th>
+                {{/data.rows}}
+            </tr>
+        </table>
+    </div>
+</div>
+</body>
+</html>
