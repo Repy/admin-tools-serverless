@@ -9,13 +9,29 @@
         <a href="/">ツールトップ</a> → <a href="/db/batch">データベース一括処理</a> → {{sql.name}}
     </div>
     <div>
-        <a download="{{sql.id}}.csv" href="/db/batch/{{sql.id}}/download">CSVダウンロード</a><br>
+        <a download="{{sql.id}}.csv" href="/db/batch/{{sql.id}}/download">投入用CSVダウンロード</a><br>
+    </div>
+    <div>
+        バッチ処理モード
     </div>
     <form method="post" enctype="multipart/form-data" action="/db/batch/{{sql.id}}">
         CSV:<input type="file" name="file"><br>
         <button type="submit">実行</button>
         <br>
     </form>
+    {{#sql.insertForm}}
+    <div>
+        とりあえず1件だけ処理モード
+    </div>
+    <form method="post" enctype="multipart/form-data" action="/db/batch/{{sql.id}}/form">
+        {{#sql.params}}
+        {{.}}:<br><textarea style="height: 40px;width: 400px;" name="{{.}}"></textarea><br>
+        {{/sql.params}}
+        <button type="submit">実行</button>
+        <br>
+    </form>
+    {{/sql.insertForm}}
+
 </div>
 </body>
 </html>

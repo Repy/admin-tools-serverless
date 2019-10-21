@@ -10,5 +10,7 @@ public class DbBatchConfig {
     private String name;
     private String sql;
     private String initSql;
+    private String finallySql;
+    private boolean insertForm;
     private String[] params;
 }

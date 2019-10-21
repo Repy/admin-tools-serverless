@@ -104,10 +104,7 @@ public class DbBatchController {
                     }
                     list.add(data);
                 }
-                if (sql.getInitSql() != null) {
-                    this.jdbc.update(sql.getInitSql(), new HashMap<>());
-                }
-                this.jdbc.batchUpdate(sql.getSql(), list.toArray(new Map[]{}));
+                this.batchUpdate(sql, list);
                 return new ModelAndView("db/batch/id").addObject("sql", sql);
             }
         } catch (
@@ -115,6 +112,30 @@ public class DbBatchController {
             throw new RuntimeException(e);
         }
 
+    }
+
+    @PostMapping(path = "/db/batch/{id}/form")
+    public ModelAndView postForm(
+            @PathVariable("id") String id,
+            @RequestParam Map<String, String> params
+    ) {
+        List<DbBatchConfig> conf = config.read().getDbBatch();
+        Optional<DbBatchConfig> sqlOpt = conf.stream().filter((data) -> {
+            return Objects.equals(data.getId(), id);
+        }).findFirst();
+        DbBatchConfig sql = sqlOpt.get();
+        this.batchUpdate(sql, Arrays.asList(params));
+        return new ModelAndView("db/batch/id").addObject("sql", sql);
+    }
+
+    public void batchUpdate(DbBatchConfig sql, List<Map<String, String>> list) {
+        if (sql.getInitSql() != null) {
+            this.jdbc.update(sql.getInitSql(), new HashMap<>());
+        }
+        this.jdbc.batchUpdate(sql.getSql(), list.toArray(new Map[]{}));
+        if (sql.getFinallySql() != null) {
+            this.jdbc.update(sql.getFinallySql(), new HashMap<>());
+        }
     }
 
     @GetMapping(path = "/db/batch/{id}/download", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
