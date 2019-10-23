@@ -12,6 +12,7 @@ import org.apache.commons.io.ByteOrderMark;
 import org.apache.commons.io.input.BOMInputStream;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -20,7 +21,6 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.*;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -145,8 +145,7 @@ public class DbBatchController {
     }
 
     @GetMapping(path = "/db/batch/{id}/download", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
-    @ResponseBody
-    public byte[] download(@PathVariable("id") String id) {
+    public ResponseEntity<byte[]> download(@PathVariable("id") String id) {
         List<DbBatchConfig> conf = config.read().getDbBatch();
         Optional<DbBatchConfig> sqlOpt = conf.stream().filter((data) -> {
             return Objects.equals(data.getId(), id);
@@ -160,7 +159,11 @@ public class DbBatchController {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        return sw.toString().getBytes(StandardCharsets.UTF_8);
+
+        return ResponseEntity.ok()
+                .header("Content-Disposition", "attachment;filename=\"" + sqlOpt.get().getId() + ".csv\"")
+                .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                .body(sw.toString().getBytes(StandardCharsets.UTF_8));
     }
 
 }

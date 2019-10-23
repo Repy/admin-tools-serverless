@@ -9,6 +9,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -17,7 +18,6 @@ import org.springframework.web.servlet.ModelAndView;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.io.StringWriter;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.sql.ResultSetMetaData;
 import java.util.*;
@@ -52,7 +52,7 @@ public class DbCsvController {
         List<List<String>> rows = new ArrayList<>();
     }
 
-    private DBData data(DbCsvConfig sql, Map<String, String> data){
+    private DBData data(DbCsvConfig sql, Map<String, String> data) {
         List<String> headers = new ArrayList<>();
         List<List<String>> rows = this.jdbc.query(sql.getSql(), data, (rs, rowNum) -> {
             if (headers.isEmpty()) {
@@ -72,9 +72,8 @@ public class DbCsvController {
         return new DBData(headers, rows);
     }
 
-    @GetMapping(path = "/db/csv/{id}/download", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
-    @ResponseBody
-    public byte[] download(@PathVariable("id") String id, HttpServletRequest request) {
+    @GetMapping(path = "/db/csv/{id}/download")
+    public ResponseEntity<byte[]> download(@PathVariable("id") String id, HttpServletRequest request) {
         List<DbCsvConfig> conf = config.read().getDbCsv();
         Optional<DbCsvConfig> sqlOpt = conf.stream().filter((data) -> {
             return Objects.equals(data.getId(), id);
@@ -96,7 +95,10 @@ public class DbCsvController {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        return sw.toString().getBytes(StandardCharsets.UTF_8);
+        return ResponseEntity.ok()
+                .header("Content-Disposition", "attachment;filename=\"" + sql.getId() + ".csv\"")
+                .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                .body(sw.toString().getBytes(StandardCharsets.UTF_8));
     }
 
     @GetMapping(path = "/db/csv/{id}/view", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
