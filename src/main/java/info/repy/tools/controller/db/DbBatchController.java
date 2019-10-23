@@ -17,10 +17,12 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.*;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Controller
 public class DbBatchController {
@@ -111,20 +113,23 @@ public class DbBatchController {
                 IOException e) {
             throw new RuntimeException(e);
         }
-
     }
 
     @PostMapping(path = "/db/batch/{id}/form")
     public ModelAndView postForm(
             @PathVariable("id") String id,
-            @RequestParam Map<String, String> params
+            HttpServletRequest request
     ) {
         List<DbBatchConfig> conf = config.read().getDbBatch();
         Optional<DbBatchConfig> sqlOpt = conf.stream().filter((data) -> {
             return Objects.equals(data.getId(), id);
         }).findFirst();
         DbBatchConfig sql = sqlOpt.get();
-        this.batchUpdate(sql, Arrays.asList(params));
+        Map<String, String> map = request.getParameterMap().entrySet().stream().collect(Collectors.toMap(
+                ent -> ent.getKey(),
+                ent -> ent.getValue()[0]
+        ));
+        this.batchUpdate(sql, Arrays.asList(map));
         return new ModelAndView("db/batch/id").addObject("sql", sql);
     }
 

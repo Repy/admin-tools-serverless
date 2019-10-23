@@ -23,7 +23,7 @@
     <div>
         とりあえず1件だけ処理モード
     </div>
-    <form method="post" enctype="multipart/form-data" action="/db/batch/{{sql.id}}/form">
+    <form method="post" action="/db/batch/{{sql.id}}/form">
         {{#sql.params}}
         {{.}}:<br><textarea style="height: 40px;width: 400px;" name="{{.}}"></textarea><br>
         {{/sql.params}}
@@ -31,7 +31,6 @@
         <br>
     </form>
     {{/sql.insertForm}}
-
 </div>
 </body>
 </html>
