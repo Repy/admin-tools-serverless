@@ -8,4 +8,11 @@ public class DbCsvConfig {
     private String name;
     private String sql;
     private String description;
+    private Param[] params;
+
+    @Data
+    public static class Param{
+        private String name;
+        private String description;
+    }
 }

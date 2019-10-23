@@ -2,6 +2,7 @@ package info.repy.tools.controller.db;
 
 import com.opencsv.CSVWriterBuilder;
 import com.opencsv.ICSVWriter;
+import info.repy.tools.controller.Util;
 import info.repy.tools.controller.config.DbCsvConfig;
 import info.repy.tools.controller.Config;
 import lombok.AllArgsConstructor;
@@ -13,9 +14,11 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.sql.ResultSetMetaData;
 import java.util.*;
 
@@ -49,9 +52,9 @@ public class DbCsvController {
         List<List<String>> rows = new ArrayList<>();
     }
 
-    private DBData data(DbCsvConfig sql){
+    private DBData data(DbCsvConfig sql, Map<String, String> data){
         List<String> headers = new ArrayList<>();
-        List<List<String>> rows = this.jdbc.query(sql.getSql(), (rs, rowNum) -> {
+        List<List<String>> rows = this.jdbc.query(sql.getSql(), data, (rs, rowNum) -> {
             if (headers.isEmpty()) {
                 ResultSetMetaData meta = rs.getMetaData();
                 for (int i = 0; i < meta.getColumnCount(); i++) {
@@ -71,17 +74,18 @@ public class DbCsvController {
 
     @GetMapping(path = "/db/csv/{id}/download", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
     @ResponseBody
-    public byte[] download(@PathVariable("id") String id) {
+    public byte[] download(@PathVariable("id") String id, HttpServletRequest request) {
         List<DbCsvConfig> conf = config.read().getDbCsv();
         Optional<DbCsvConfig> sqlOpt = conf.stream().filter((data) -> {
             return Objects.equals(data.getId(), id);
         }).findFirst();
         DbCsvConfig sql = sqlOpt.get();
 
-        DBData data = this.data(sql);
+        DBData data = this.data(sql, Util.toSingleMap(request.getParameterMap()));
 
         // CSV
         StringWriter sw = new StringWriter();
+        sw.append('\uFEFF'); // UTF-8のBOM追加
         try (
                 ICSVWriter writer = new CSVWriterBuilder(sw).build();
         ) {
@@ -92,19 +96,19 @@ public class DbCsvController {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        return sw.toString().getBytes(Charset.forName("Windows-31J"));
+        return sw.toString().getBytes(StandardCharsets.UTF_8);
     }
 
     @GetMapping(path = "/db/csv/{id}/view", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
     @ResponseBody
-    public ModelAndView view(@PathVariable("id") String id) {
+    public ModelAndView view(@PathVariable("id") String id, HttpServletRequest request) {
         List<DbCsvConfig> conf = config.read().getDbCsv();
         Optional<DbCsvConfig> sqlOpt = conf.stream().filter((data) -> {
             return Objects.equals(data.getId(), id);
         }).findFirst();
         DbCsvConfig sql = sqlOpt.get();
 
-        DBData data = this.data(sql);
+        DBData data = this.data(sql, Util.toSingleMap(request.getParameterMap()));
 
         return new ModelAndView("db/csv/view").addObject("sql", sqlOpt.get()).addObject("data", data);
     }

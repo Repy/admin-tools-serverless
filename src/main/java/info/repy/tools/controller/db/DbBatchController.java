@@ -6,6 +6,7 @@ import com.opencsv.CSVReaderHeaderAware;
 import com.opencsv.CSVWriterBuilder;
 import com.opencsv.ICSVWriter;
 import info.repy.tools.controller.Config;
+import info.repy.tools.controller.Util;
 import info.repy.tools.controller.config.DbBatchConfig;
 import org.apache.commons.io.ByteOrderMark;
 import org.apache.commons.io.input.BOMInputStream;
@@ -137,7 +138,7 @@ public class DbBatchController {
         if (sql.getInitSql() != null) {
             this.jdbc.update(sql.getInitSql(), new HashMap<>());
         }
-        this.jdbc.batchUpdate(sql.getSql(), list.toArray(new Map[]{}));
+        this.jdbc.batchUpdate(sql.getSql(), Util.toListMap(list));
         if (sql.getFinallySql() != null) {
             this.jdbc.update(sql.getFinallySql(), new HashMap<>());
         }
@@ -151,6 +152,7 @@ public class DbBatchController {
             return Objects.equals(data.getId(), id);
         }).findFirst();
         StringWriter sw = new StringWriter();
+        sw.append('\uFEFF'); // UTF-8のBOM追加
         try (
                 ICSVWriter writer = new CSVWriterBuilder(sw).build();
         ) {
@@ -158,7 +160,7 @@ public class DbBatchController {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        return sw.toString().getBytes(Charset.forName("Windows-31J"));
+        return sw.toString().getBytes(StandardCharsets.UTF_8);
     }
 
 }
