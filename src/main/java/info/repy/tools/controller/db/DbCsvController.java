@@ -65,6 +65,7 @@ public class DbCsvController {
             List<String> row = new ArrayList<>();
             for (int i = 0; i < headers.size(); i++) {
                 String val = rs.getString(i + 1);
+                if (val == null) val = "NULL";
                 row.add(val);
             }
             return row;
