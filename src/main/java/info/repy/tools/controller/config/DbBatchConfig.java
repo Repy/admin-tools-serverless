@@ -6,11 +6,12 @@ import java.util.List;
 
 @Data
 public class DbBatchConfig {
-    private String id;
-    private String name;
-    private String sql;
-    private String initSql;
-    private String finallySql;
-    private boolean insertForm;
-    private String[] params;
+    private String id = "";
+    private String name = "";
+    private String description = "";
+    private String sql = null;
+    private String initSql = null;
+    private String finallySql = null;
+    private boolean insertForm = false;
+    private String[] params = new String[0];
 }
