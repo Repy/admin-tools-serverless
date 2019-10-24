@@ -135,6 +135,14 @@ public class DbBatchController {
     }
 
     public void batchUpdate(DbBatchConfig sql, List<Map<String, String>> list) {
+        // "NULL"→nullに変換
+        for (Map<String, String> map : list) {
+            for (String key : map.keySet()) {
+                if (Objects.equals(map.get(key), "NULL")) {
+                    map.put(key, null);
+                }
+            }
+        }
         if (sql.getInitSql() != null) {
             this.jdbc.update(sql.getInitSql(), new HashMap<>());
         }
