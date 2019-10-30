@@ -5,6 +5,7 @@ import com.ibm.icu.text.CharsetMatch;
 import com.opencsv.CSVReaderHeaderAware;
 import com.opencsv.CSVWriterBuilder;
 import com.opencsv.ICSVWriter;
+import com.opencsv.exceptions.CsvValidationException;
 import info.repy.tools.controller.Config;
 import info.repy.tools.controller.Util;
 import info.repy.tools.controller.config.DbBatchConfig;
@@ -110,8 +111,7 @@ public class DbBatchController {
                 this.batchUpdate(sql, list);
                 return new ModelAndView("db/batch/id").addObject("sql", sql);
             }
-        } catch (
-                IOException e) {
+        } catch (IOException | CsvValidationException e) {
             throw new RuntimeException(e);
         }
     }
