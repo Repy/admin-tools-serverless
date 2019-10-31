@@ -52,6 +52,7 @@ public class DynamoDbUpdateController {
         List<DynamoUploadConfig> conf = config.read().getDynamoUpload();
         DynamoUploadConfig data = conf.stream().filter((d) -> Objects.equals(d.getId(), id)).findFirst().get();
         Map<String, AttributeValue> item = DynamoDBJsonConvert.toAttributeMap(mapper.readTree(json));
+        item.put(data.getKeyName(), AttributeValue.builder().s(data.getKeyValue()).build());
         client.putItem(PutItemRequest.builder().tableName(data.getTable()).item(item).build());
         return id(id);
     }
