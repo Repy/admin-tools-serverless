@@ -30,6 +30,7 @@ public class StreamLambdaHandler {
             profile = env.split(",");
         }
         try {
+            SpringBootLambdaContainerHandler.getContainerConfig().setDefaultContentCharset("UTF-8");
             handler = SpringBootLambdaContainerHandler.getAwsProxyHandler(ToolsApplication.class, profile);
             handler.onStartup(servletContext -> {
             });
