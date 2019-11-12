@@ -13,5 +13,6 @@ public class DbBatchConfig {
     private String initSql = null;
     private String finallySql = null;
     private boolean insertForm = false;
+    private boolean firstLine = true;
     private String[] params = new String[0];
 }

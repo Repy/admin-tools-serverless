@@ -2,6 +2,7 @@ package info.repy.tools.controller.db;
 
 import com.ibm.icu.text.CharsetDetector;
 import com.ibm.icu.text.CharsetMatch;
+import com.opencsv.CSVReader;
 import com.opencsv.CSVReaderHeaderAware;
 import com.opencsv.CSVWriterBuilder;
 import com.opencsv.ICSVWriter;
@@ -93,24 +94,55 @@ public class DbBatchController {
             }
             if (detect == null) throw new RuntimeException();
 
-            try (
-                    Reader reader = detect.getReader();
-                    CSVReaderHeaderAware csv = new CSVReaderHeaderAware(reader);
-            ) {
-                ArrayList<Map<String, String>> list = new ArrayList<>();
-                Map<String, String> data;
-                while ((data = csv.readMap()) != null) {
-                    for (String key : data.keySet()) {
-                        String value = data.get(key);
-                        if (Objects.equals(value, "NULL")) {
-                            data.put(key, null);
+            ArrayList<Map<String, String>> list = new ArrayList<>();
+
+            if (sql.isFirstLine()) {
+                // 1行目がヘッダーモード
+                try (
+                        Reader reader = detect.getReader();
+                        CSVReaderHeaderAware csv = new CSVReaderHeaderAware(reader);
+                ) {
+                    Map<String, String> data;
+                    while ((data = csv.readMap()) != null) {
+                        for (String key : data.keySet()) {
+                            String value = data.get(key);
+                            if (Objects.equals(value, "NULL")) {
+                                data.put(key, null);
+                            }
                         }
+                        list.add(data);
                     }
-                    list.add(data);
                 }
-                this.batchUpdate(sql, list);
-                return new ModelAndView("db/batch/id").addObject("sql", sql);
+            } else {
+                // ヘッダー強制モード
+                try (
+                        Reader reader = detect.getReader();
+                        CSVReader csv = new CSVReader(reader);
+                ) {
+                    String[] headers = sql.getParams();
+                    String[] data;
+                    while ((data = csv.readNext()) != null) {
+                        HashMap<String, String> map = new HashMap<>();
+                        if (data.length < headers.length) {
+                            throw new RuntimeException("csv length");
+                        }
+                        for (int i = 0; i < headers.length; i++) {
+                            String key = headers[i];
+                            String value = data[i];
+                            if (key == null || key.isEmpty()) continue;
+                            if (Objects.equals(value, "NULL")) {
+                                map.put(key, null);
+                            } else {
+                                map.put(key, value);
+                            }
+                        }
+                        list.add(map);
+                    }
+                }
             }
+
+            this.batchUpdate(sql, list);
+            return new ModelAndView("db/batch/id").addObject("sql", sql);
         } catch (IOException | CsvValidationException e) {
             throw new RuntimeException(e);
         }
