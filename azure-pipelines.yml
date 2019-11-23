@@ -21,7 +21,7 @@ steps:
     tasks: 'buildZip'
     publishJUnitResults: false
     javaHomeOption: 'JDKVersion'
-    jdkVersionOption: '1.8'
+    jdkVersionOption: '1.11'
 
 - task: GitHubRelease@0
   inputs:
